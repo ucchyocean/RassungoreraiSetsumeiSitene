@@ -16,10 +16,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -144,6 +147,49 @@ public class RassungoreraiSetsumeiSitene extends JavaPlugin implements Listener 
                 counters.get(event.getPlayer().getName()).addCounter();
                 event.getPlayer().getInventory().addItem(config.getAward().clone());
             }
+        }
+    }
+
+    /**
+     * 生物がスポーンした時に呼び出される
+     * @param event
+     */
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onCreatureSpawn(CreatureSpawnEvent event) {
+
+        // bleeding以外は無視する
+        if ( event.getSpawnReason() != SpawnReason.BREEDING ) {
+            return;
+        }
+
+        // エイプリルフールタイマーが有効なら、4月1日じゃないときは動作しない
+        if ( config.isAprilfoolTimer() ) {
+            Calendar cal = Calendar.getInstance();
+            if ( cal.get(Calendar.MONTH) != Calendar.APRIL ||
+                    cal.get(Calendar.DAY_OF_MONTH) != 1 ) {
+                return;
+            }
+        }
+
+        // 近隣のエンティティを取得し、サウジアラビア人とインド人がいるかどうかを確認する
+        boolean saudiarabian = false;
+        boolean indian = false;
+        for ( Entity entity : event.getEntity().getNearbyEntities(3, 3, 3) ) {
+            if ( !entity.equals(event.getEntity())
+                    && entity.getType() == event.getEntityType()
+                    && entity.getCustomName() != null ) {
+                if ( entity.getCustomName().equals("サウジアラビア人") ) {
+                    saudiarabian = true;
+                } else if ( entity.getCustomName().equals("インド人") ) {
+                    indian = true;
+                }
+            }
+        }
+
+        // 両方見つかったら、名前をラッスンゴレライに変更する
+        if ( saudiarabian && indian ) {
+            event.getEntity().setCustomName("ラッスンゴレライ");
+            event.getEntity().setCustomNameVisible(true);
         }
     }
 
