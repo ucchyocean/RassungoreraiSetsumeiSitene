@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Sound;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -203,7 +202,7 @@ public class RassungoreraiSetsumeiSitene extends JavaPlugin implements Listener 
     }
 
     private void penalty(Player player) {
-        player.getWorld().playSound(player.getLocation(), Sound.ANVIL_LAND, 1, 1);
+        player.getWorld().playSound(player.getLocation(), SoundEnum.ANVIL_LAND.getBukkit(), 1, 1);
         player.damage(config.getPenaltyDamage());
     }
 
